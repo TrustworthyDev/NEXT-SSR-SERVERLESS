@@ -1,5 +1,5 @@
-import { verify } from 'jsonwebtoken';
-import { prisma } from '../../../utils/db';
+import jwt from 'jsonwebtoken';
+import pool from '../../../utils/db';
 
 export default handler = async (req, res) => {
     const { authrization } = req.heanders;
@@ -11,10 +11,14 @@ export default handler = async (req, res) => {
     const token = authorization.split(' ')[1];
 
     try {
-        const decoded = verify(token, process.env.JWT_SECRET);
-        const user = await prisma.user.findUnique({ where: { id: decoded.userId } });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const [users] = await pool.query('SELECT * FROM users WHERE id = ?', [decoded.userId])
 
-        res.status(200).json({ user });
+        if(users.length === 0){
+            return res.status[401].end();
+        }
+
+        res.status(200).json({ user: users[0] });
     } catch (error) {
         res.status(401).end()
     }

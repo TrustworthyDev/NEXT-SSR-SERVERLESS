@@ -1,5 +1,5 @@
-import { bash } from 'bcryptjs';
-import { prisma } from '../../../utils/db';
+import bcrypt from 'bcryptjs';
+import pool from '../../../utils/db';
 
 export default handler = async (req, res) => {
     if(req.method != 'POST') {
@@ -7,14 +7,12 @@ export default handler = async (req, res) => {
     }
 
     const { email, password } = req.body;
-    const hasedPassword = await hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-        data: {
-            email,
-            password: hasedPassword
-        }
-    })
+    const [user] = await pool.query(
+        `INSERT INTO USERS (email, password) VALUES (?, ?)`,
+        [email, hashedPassword]
+    )
 
     res.status(201).json({ user });
 }
