@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from 'axios';l
 
 export const login = async (email, password) => {
     const response = await axios.post('/api/auth/login', { email, password });
@@ -11,9 +11,9 @@ export const getMe = async () => {
 
     try {
         const response = await axios.get('/api/auth/me', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
         });
         return response.data.user;
     } catch {
